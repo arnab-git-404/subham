@@ -13,7 +13,7 @@ export async function GET() {
     if (!profile) {
       // Return default profile if none exists
       return successResponse({
-        fullName: "Subham Das",
+        fullName: "Subham Kaibarta",
         tagline: "BMLT Student | Future Medical Lab Technologist",
         bio: "",
         year: "3rd Year BMLT",

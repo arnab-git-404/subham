@@ -94,11 +94,11 @@ export default function Home() {
         <div className="absolute bottom-0 left-0 h-[300px] w-[300px] rounded-full bg-clinical-blue/3 blur-[100px] dark:bg-clinical-blue/8" />
 
         {/* 3D Canvas - full viewport */}
-        <div className="absolute inset-0 z-0">
+        {/* <div className="absolute inset-0 z-0">
           <ErrorBoundary>
             <Scene3D />
           </ErrorBoundary>
-        </div>
+        </div> */}
 
         {/* Hero content overlay */}
         <div className="relative z-10 flex min-h-screen flex-col items-center justify-center px-4 pt-20 text-center">
@@ -129,7 +129,7 @@ export default function Home() {
                 Subham
               </span>{" "}
               <span className="bg-gradient-to-r from-clinical-blue via-bio-teal to-clinical-blue bg-clip-text text-transparent">
-                Das
+                kaibarta
               </span>
             </h1>
 

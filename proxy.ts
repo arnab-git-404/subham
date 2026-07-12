@@ -5,7 +5,7 @@ import { verifyToken } from "@/lib/auth";
 const protectedPaths = ["/admin/dashboard", "/admin/certificates", "/admin/workshops", "/admin/messages"];
 const authPaths = ["/admin/login"];
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Only apply to /admin routes

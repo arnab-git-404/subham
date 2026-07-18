@@ -113,7 +113,7 @@ export default function Home() {
               className="flex flex-col items-center gap-4"
             >
               <div className="relative">
-                <div className="h-28 w-28 overflow-hidden rounded-2xl border-2 border-white/40 shadow-xl shadow-clinical-blue/10 ring-2 ring-clinical-blue/20">
+                <div className="h-40 w-40 overflow-hidden rounded-2xl border-2 border-white/40 shadow-xl shadow-clinical-blue/10 ring-2 ring-clinical-blue/20 sm:h-44 sm:w-44">
                   {p?.avatarUrl ? (
                     <img
                       src={p.avatarUrl}
@@ -122,7 +122,7 @@ export default function Home() {
                     />
                   ) : (
                     <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-clinical-blue/20 to-bio-teal/20">
-                      <User className="h-10 w-10 text-clinical-blue/40" />
+                      <User className="h-14 w-14 text-clinical-blue/40 sm:h-16 sm:w-16" />
                     </div>
                   )}
                 </div>

@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import FileUpload from "@/components/FileUpload";
 import {
   Select,
   SelectContent,
@@ -338,33 +339,26 @@ export default function AdminCertificatesPage() {
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="issueDate">Issue Date *</Label>
-                <Input
-                  id="issueDate"
-                  type="date"
-                  required
-                  value={formData.issueDate}
-                  onChange={(e) =>
-                    setFormData({ ...formData, issueDate: e.target.value })
-                  }
-                />
-              </div>
+            <div className="space-y-2">
+              <Label htmlFor="issueDate">Issue Date *</Label>
+              <Input
+                id="issueDate"
+                type="date"
+                required
+                value={formData.issueDate}
+                onChange={(e) =>
+                  setFormData({ ...formData, issueDate: e.target.value })
+                }
+              />
+            </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="fileUrl">File URL *</Label>
-                <Input
-                  id="fileUrl"
-                  type="url"
-                  required
-                  placeholder="https://..."
-                  value={formData.fileUrl}
-                  onChange={(e) =>
-                    setFormData({ ...formData, fileUrl: e.target.value })
-                  }
-                />
-              </div>
+            <div className="space-y-2">
+              <Label>Certificate File *</Label>
+              <FileUpload
+                value={formData.fileUrl}
+                onChange={(url) => setFormData({ ...formData, fileUrl: url })}
+                label="Upload Certificate"
+              />
             </div>
 
             <div className="space-y-2">

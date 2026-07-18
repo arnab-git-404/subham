@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import FileUpload from "@/components/FileUpload";
 import {
   Dialog,
   DialogContent,
@@ -309,18 +310,13 @@ export default function AdminWorkshopsPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="certificateFileUrl">Certificate File URL</Label>
-              <Input
-                id="certificateFileUrl"
-                type="url"
-                placeholder="https://..."
+              <Label>Certificate File</Label>
+              <FileUpload
                 value={formData.certificateFileUrl}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    certificateFileUrl: e.target.value,
-                  })
+                onChange={(url) =>
+                  setFormData({ ...formData, certificateFileUrl: url })
                 }
+                label="Upload Certificate"
               />
             </div>
 

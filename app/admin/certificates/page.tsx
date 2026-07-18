@@ -207,7 +207,7 @@ export default function AdminCertificatesPage() {
                 <TableHead className="hidden md:table-cell">Category</TableHead>
                 <TableHead className="hidden lg:table-cell">Issuer</TableHead>
                 <TableHead className="hidden md:table-cell">Date</TableHead>
-                <TableHead className="w-[80px]">Actions</TableHead>
+                <TableHead className="w-20">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>

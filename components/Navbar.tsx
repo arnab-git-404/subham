@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
 import { FlaskConical, Menu, X } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import ThemeToggle from "./ThemeToggle";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -21,7 +21,20 @@ const navLinks = [
 export default function Navbar() {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [profile, setProfile] = useState<{ fullName?: string; avatarUrl?: string } | null>(null);
   const isAdmin = pathname.startsWith("/admin");
+
+  useEffect(() => {
+    if (isAdmin) return;
+    fetch("/api/profile")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success && data.data) {
+          setProfile(data.data);
+        }
+      })
+      .catch(() => {});
+  }, [isAdmin]);
 
   if (isAdmin) return null;
 
@@ -31,11 +44,19 @@ export default function Navbar() {
         <div className="flex items-center justify-between">
           {/* Logo */}
           <Link href="/" className="group flex items-center gap-2">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-clinical-blue/10 transition-all group-hover:bg-clinical-blue/20">
-              <FlaskConical className="h-5 w-5 text-clinical-blue" />
+            <div className="relative flex h-9 w-9 items-center justify-center overflow-hidden rounded-lg bg-clinical-blue/10 transition-all group-hover:bg-clinical-blue/20">
+              {profile?.avatarUrl ? (
+                <img
+                  src={profile.avatarUrl}
+                  alt={profile.fullName || "Profile"}
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                <FlaskConical className="h-5 w-5 text-clinical-blue" />
+              )}
             </div>
             <span className="hidden text-sm font-semibold text-deep-diagnostic dark:text-ice-blue sm:block">
-              Subham Das
+              {profile?.fullName || "Portfolio"}
             </span>
           </Link>
 

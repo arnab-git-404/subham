@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Send, Briefcase, Code2, Camera, Mail, Download } from "lucide-react";
 import GlassCard from "@/components/GlassCard";
@@ -8,8 +8,19 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import LoadingSpinner from "@/components/LoadingSpinner";
+import type { ApiResponse, IProfile } from "@/types";
+
+const socialProfiles = [
+  { key: "linkedin", label: "LinkedIn", icon: Briefcase, color: "hover:text-[#0077B5]" },
+  { key: "github", label: "GitHub", icon: Code2, color: "hover:text-foreground" },
+  { key: "instagram", label: "Instagram", icon: Camera, color: "hover:text-[#E4405F]" },
+  { key: "email", label: "Email", icon: Mail, color: "hover:text-bio-teal" },
+] as const;
 
 export default function ContactPage() {
+  const [profile, setProfile] = useState<IProfile | null>(null);
+  const [loading, setLoading] = useState(true);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -19,6 +30,20 @@ export default function ContactPage() {
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    fetch("/api/profile")
+      .then((res) => res.json())
+      .then((data: ApiResponse<IProfile>) => {
+        if (data.success && data.data) {
+          setProfile(data.data);
+        }
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
+
+  const links = profile?.socialLinks ?? {};
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -44,6 +69,14 @@ export default function ContactPage() {
     } finally {
       setSubmitting(false);
     }
+  }
+
+  if (loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center pt-28">
+        <LoadingSpinner size="lg" />
+      </div>
+    );
   }
 
   return (
@@ -177,91 +210,77 @@ export default function ContactPage() {
             className="space-y-6"
           >
             {/* Resume download */}
-            <GlassCard>
-              <div className="space-y-3">
-                <h3 className="font-heading text-base font-semibold text-deep-diagnostic dark:text-ice-blue">
-                  Download Resume
-                </h3>
-                <p className="text-xs text-muted-foreground">
-                  Get a detailed overview of my education, skills, and experience.
-                </p>
-                <a
-                  href="/documents/resume.pdf"
-                  download
-                  className="inline-flex items-center gap-2 rounded-lg border border-bio-teal/30 px-4 py-2 text-sm font-medium text-bio-teal transition-all hover:bg-bio-teal/5 hover:shadow-[0_0_12px_rgba(0,180,216,0.15)]"
-                >
-                  <Download className="h-4 w-4" />
-                  Download CV / Resume
-                </a>
-              </div>
-            </GlassCard>
+            {profile?.resumeUrl && (
+              <GlassCard>
+                <div className="space-y-3">
+                  <h3 className="font-heading text-base font-semibold text-deep-diagnostic dark:text-ice-blue">
+                    Download Resume
+                  </h3>
+                  <p className="text-xs text-muted-foreground">
+                    Get a detailed overview of my education, skills, and experience.
+                  </p>
+                  <a
+                    href={profile.resumeUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 rounded-lg border border-bio-teal/30 px-4 py-2 text-sm font-medium text-bio-teal transition-all hover:bg-bio-teal/5 hover:shadow-[0_0_12px_rgba(0,180,216,0.15)]"
+                  >
+                    <Download className="h-4 w-4" />
+                    Download CV / Resume
+                  </a>
+                </div>
+              </GlassCard>
+            )}
 
             {/* Social links */}
-            <GlassCard>
-              <div className="space-y-4">
-                <h3 className="font-heading text-base font-semibold text-deep-diagnostic dark:text-ice-blue">
-                  Connect With Me
-                </h3>
-                <div className="grid grid-cols-2 gap-3">
-                  {[
-                    {
-                      icon: Briefcase,
-                      label: "LinkedIn",
-                      href: "#",
-                      color: "hover:text-[#0077B5]",
-                    },
-                    {
-                      icon: Code2,
-                      label: "GitHub",
-                      href: "#",
-                      color: "hover:text-foreground",
-                    },
-                    {
-                      icon: Camera,
-                      label: "Instagram",
-                      href: "#",
-                      color: "hover:text-[#E4405F]",
-                    },
-                    {
-                      icon: Mail,
-                      label: "Email",
-                      href: "mailto:#",
-                      color: "hover:text-bio-teal",
-                    },
-                  ].map(({ icon: Icon, label, href, color }) => (
-                    <a
-                      key={label}
-                      href={href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className={`flex items-center gap-3 rounded-xl border border-white/20 bg-white/30 p-3 text-sm text-muted-foreground backdrop-blur-sm transition-all hover:border-bio-teal/30 hover:shadow-[0_0_12px_rgba(0,180,216,0.15)] dark:border-white/10 dark:bg-dark-base/30 ${color}`}
-                    >
-                      <Icon className="h-4 w-4 shrink-0" />
-                      <span className="hidden sm:inline">{label}</span>
-                    </a>
-                  ))}
+            {Object.values(links).some(Boolean) && (
+              <GlassCard>
+                <div className="space-y-4">
+                  <h3 className="font-heading text-base font-semibold text-deep-diagnostic dark:text-ice-blue">
+                    Connect With Me
+                  </h3>
+                  <div className="grid grid-cols-2 gap-3">
+                    {socialProfiles.map(({ key, label, icon: Icon, color }) => {
+                      const href = (links as Record<string, string>)[key];
+                      if (!href) return null;
+                      return (
+                        <a
+                          key={key}
+                          href={href}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className={`flex items-center gap-3 rounded-xl border border-white/20 bg-white/30 p-3 text-sm text-muted-foreground backdrop-blur-sm transition-all hover:border-bio-teal/30 hover:shadow-[0_0_12px_rgba(0,180,216,0.15)] dark:border-white/10 dark:bg-dark-base/30 ${color}`}
+                        >
+                          <Icon className="h-4 w-4 shrink-0" />
+                          <span className="hidden sm:inline">{label}</span>
+                        </a>
+                      );
+                    })}
+                  </div>
                 </div>
-              </div>
-            </GlassCard>
+              </GlassCard>
+            )}
 
-            {/* Quick contact */}
-            <GlassCard>
-              <div className="space-y-3 text-sm">
-                <h3 className="font-heading text-base font-semibold text-deep-diagnostic dark:text-ice-blue">
-                  Direct Contact
-                </h3>
-                <p className="text-xs text-muted-foreground">
-                  For urgent inquiries, feel free to reach out directly via email.
-                </p>
-                <a
-                  href="mailto:#"
-                  className="inline-flex items-center gap-2 text-sm text-clinical-blue transition-colors hover:text-bio-teal"
-                >
-                  <Mail className="h-4 w-4" />
-                  subham.das@email.com
-                </a>
-              </div>
-            </GlassCard>
+            {/* Email contact */}
+            {links.email && (
+              <GlassCard>
+                <div className="space-y-3 text-sm">
+                  <h3 className="font-heading text-base font-semibold text-deep-diagnostic dark:text-ice-blue">
+                    Direct Contact
+                  </h3>
+                  <p className="text-xs text-muted-foreground">
+                    For urgent inquiries, feel free to reach out directly via email.
+                  </p>
+                  <a
+                    href={`mailto:${links.email}`}
+                    className="inline-flex items-center gap-2 text-sm text-clinical-blue transition-colors hover:text-bio-teal"
+                  >
+                    <Mail className="h-4 w-4" />
+                    {links.email}
+                  </a>
+                </div>
+              </GlassCard>
+            )}
           </motion.div>
         </div>
       </div>

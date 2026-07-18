@@ -1,44 +1,43 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import {
-  Microscope,
-  FlaskConical,
-  Dna,
-  HeartPulse,
-  Shield,
-  Beaker,
-  Users,
-  Clock,
-  Search,
-  BookOpen,
-} from "lucide-react";
+import { Microscope } from "lucide-react";
 import GlassCard from "@/components/GlassCard";
-
-const skillCategories = [
-  {
-    title: "Laboratory Skills",
-    skills: [
-      { name: "Hematology", icon: HeartPulse, level: "Advanced" },
-      { name: "Microbiology", icon: Microscope, level: "Advanced" },
-      { name: "Clinical Biochemistry", icon: FlaskConical, level: "Intermediate" },
-      { name: "Clinical Pathology", icon: Dna, level: "Intermediate" },
-      { name: "Lab Safety Protocols", icon: Shield, level: "Advanced" },
-      { name: "Equipment Handling", icon: Beaker, level: "Intermediate" },
-    ],
-  },
-  {
-    title: "Soft Skills",
-    skills: [
-      { name: "Attention to Detail", icon: Search, level: "Advanced" },
-      { name: "Time Management", icon: Clock, level: "Advanced" },
-      { name: "Team Collaboration", icon: Users, level: "Intermediate" },
-      { name: "Continuous Learning", icon: BookOpen, level: "Advanced" },
-    ],
-  },
-];
+import LoadingSpinner from "@/components/LoadingSpinner";
+import type { ApiResponse, IProfile } from "@/types";
 
 export default function SkillsPage() {
+  const [profile, setProfile] = useState<IProfile | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchProfile() {
+      try {
+        const res = await fetch("/api/profile");
+        const data: ApiResponse<IProfile> = await res.json();
+        if (data.success && data.data) {
+          setProfile(data.data);
+        }
+      } catch (err) {
+        console.error("Failed to fetch profile:", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchProfile();
+  }, []);
+
+  const skills = profile?.skills ?? [];
+
+  if (loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center pt-28">
+        <LoadingSpinner size="lg" />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen pt-28 pb-20">
       <div className="mx-auto max-w-5xl px-4">
@@ -60,64 +59,53 @@ export default function SkillsPage() {
           </p>
         </motion.div>
 
-        {/* Skill Categories */}
-        <div className="space-y-12">
-          {skillCategories.map((category, catIndex) => (
-            <motion.div
-              key={category.title}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: catIndex * 0.2 }}
-            >
-              <h2 className="mb-6 font-heading text-xl font-bold text-deep-diagnostic dark:text-ice-blue">
-                {category.title}
-              </h2>
-              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                {category.skills.map((skill, skillIndex) => (
-                  <motion.div
-                    key={skill.name}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: catIndex * 0.2 + skillIndex * 0.1 }}
-                  >
-                    <GlassCard glow className="group h-full">
-                      <div className="flex items-start gap-4">
-                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-clinical-blue/10 to-bio-teal/10 transition-all group-hover:from-clinical-blue/20 group-hover:to-bio-teal/20">
-                          <skill.icon className="h-5 w-5 text-clinical-blue transition-all group-hover:text-bio-teal" />
+        {skills.length === 0 ? (
+          <GlassCard className="text-center">
+            <Microscope className="mx-auto h-12 w-12 text-muted-foreground/30" />
+            <p className="mt-4 text-sm text-muted-foreground">
+              No skills added yet. Check back soon!
+            </p>
+          </GlassCard>
+        ) : (
+          <motion.div
+            initial="hidden"
+            animate="visible"
+            variants={{
+              visible: { transition: { staggerChildren: 0.05 } },
+            }}
+            className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
+          >
+            {skills.map((skill, i) => (
+              <motion.div
+                key={skill}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.05 }}
+              >
+                <GlassCard glow className="group h-full">
+                  <div className="flex items-start gap-4">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-clinical-blue/10 to-bio-teal/10 transition-all group-hover:from-clinical-blue/20 group-hover:to-bio-teal/20">
+                      <Microscope className="h-5 w-5 text-clinical-blue transition-all group-hover:text-bio-teal" />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="text-sm font-semibold text-deep-diagnostic dark:text-ice-blue">
+                        {skill}
+                      </h3>
+                      <div className="mt-2 flex items-center gap-2">
+                        <div className="h-1.5 flex-1 rounded-full bg-clinical-blue/10">
+                          <div className="h-full w-full rounded-full bg-gradient-to-r from-clinical-blue to-bio-teal" />
                         </div>
-                        <div className="flex-1">
-                          <h3 className="text-sm font-semibold text-deep-diagnostic dark:text-ice-blue">
-                            {skill.name}
-                          </h3>
-                          <div className="mt-2 flex items-center gap-2">
-                            <div className="h-1.5 flex-1 rounded-full bg-clinical-blue/10">
-                              <div
-                                className={`h-full rounded-full ${
-                                  skill.level === "Advanced"
-                                    ? "w-full bg-gradient-to-r from-clinical-blue to-bio-teal"
-                                    : "w-2/3 bg-gradient-to-r from-clinical-blue/70 to-bio-teal/70"
-                                }`}
-                              />
-                            </div>
-                            <span
-                              className={`text-[10px] font-medium ${
-                                skill.level === "Advanced"
-                                  ? "text-bio-teal"
-                                  : "text-muted-foreground"
-                              }`}
-                            >
-                              {skill.level}
-                            </span>
-                          </div>
-                        </div>
+                        <span className="text-[10px] font-medium text-bio-teal">
+                          Proficient
+                        </span>
                       </div>
-                    </GlassCard>
-                  </motion.div>
-                ))}
-              </div>
-            </motion.div>
-          ))}
-        </div>
+                    </div>
+                  </div>
+                </GlassCard>
+              </motion.div>
+            ))}
+          </motion.div>
+        )}
       </div>
     </div>
   );

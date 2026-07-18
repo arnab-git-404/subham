@@ -2,6 +2,7 @@
 
 import dynamic from "next/dynamic";
 import Link from "next/link";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import {
   ArrowRight,
@@ -21,6 +22,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import GlassCard from "@/components/GlassCard";
 import ErrorBoundary from "@/components/ErrorBoundary";
+import type { ApiResponse, IProfile, ICertificate, IWorkshop } from "@/types";
 
 const Scene3D = dynamic(() => import("@/components/3d/Scene"), {
   ssr: false,
@@ -83,6 +85,52 @@ const workshops = [
 ];
 
 export default function Home() {
+  const [profile, setProfile] = useState<IProfile | null>(null);
+  const [stats, setStats] = useState({ certificates: 0, workshops: 0, skills: 0 });
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const [profileRes, certsRes, workshopsRes] = await Promise.all([
+          fetch("/api/profile"),
+          fetch("/api/certificates"),
+          fetch("/api/workshops"),
+        ]);
+
+        const profileData: ApiResponse<IProfile> = await profileRes.json();
+        if (profileData.success && profileData.data) {
+          setProfile(profileData.data);
+          setStats({
+            certificates: 0,
+            workshops: 0,
+            skills: profileData.data.skills?.length ?? 0,
+          });
+        }
+
+        const certsData: ApiResponse<ICertificate[]> = await certsRes.json();
+        const workshopsData: ApiResponse<IWorkshop[]> = await workshopsRes.json();
+
+        setStats((prev) => ({
+          ...prev,
+          certificates: certsData.data?.length ?? 0,
+          workshops: workshopsData.data?.length ?? 0,
+        }));
+      } catch (err) {
+        console.error("Failed to fetch profile:", err);
+      }
+    }
+    fetchData();
+  }, []);
+
+  const p = profile;
+  const nameParts = p?.fullName?.split(" ") ?? ["Subham", "Kaibarta"];
+  const firstName = nameParts[0] ?? "Subham";
+  const lastName = nameParts.slice(1).join(" ") ?? "Kaibarta";
+  const taglineParts = p?.tagline?.split("|") ?? ["BMLT Student", "Future Medical Lab Technologist"];
+  const taglineStart = taglineParts[0]?.trim() ?? "BMLT Student";
+  const taglineEnd = taglineParts.slice(1).join(" | ").trim() || "Future Medical Lab Technologist";
+  const displaySkills = p?.skills?.length ? p.skills : skillTags;
+
   return (
     <div className="relative">
       {/* ============ HERO ============ */}
@@ -93,13 +141,6 @@ export default function Home() {
         <div className="absolute right-0 top-1/3 h-[400px] w-[400px] rounded-full bg-bio-teal/3 blur-[120px] dark:bg-bio-teal/5" />
         <div className="absolute bottom-0 left-0 h-[300px] w-[300px] rounded-full bg-clinical-blue/3 blur-[100px] dark:bg-clinical-blue/8" />
 
-        {/* 3D Canvas - full viewport */}
-        {/* <div className="absolute inset-0 z-0">
-          <ErrorBoundary>
-            <Scene3D />
-          </ErrorBoundary>
-        </div> */}
-
         {/* Hero content overlay */}
         <div className="relative z-10 flex min-h-screen flex-col items-center justify-center px-4 pt-20 text-center">
           <motion.div
@@ -108,28 +149,46 @@ export default function Home() {
             transition={{ duration: 1, ease: "easeOut" }}
             className="max-w-4xl space-y-8"
           >
-            {/* Status badge */}
+            {/* Avatar + Status badge */}
             <motion.div
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.3, duration: 0.5, type: "spring" }}
+              className="flex flex-col items-center gap-4"
             >
+              {/* Profile photo */}
+              <div className="relative">
+                <div className="h-28 w-28 overflow-hidden rounded-2xl border-2 border-white/40 shadow-xl shadow-clinical-blue/10 ring-2 ring-clinical-blue/20">
+                  {p?.avatarUrl ? (
+                    <img
+                      src={p.avatarUrl}
+                      alt={p.fullName}
+                      className="h-full w-full object-cover"
+                    />
+                  ) : (
+                    <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-clinical-blue/20 to-bio-teal/20">
+                      <User className="h-10 w-10 text-clinical-blue/40" />
+                    </div>
+                  )}
+                </div>
+              </div>
+
               <span className="inline-flex items-center gap-2 rounded-full border border-bio-teal/20 bg-white/40 px-4 py-1.5 text-xs font-medium text-bio-teal shadow-sm backdrop-blur-md dark:bg-dark-base/40">
                 <span className="relative flex h-2 w-2">
                   <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-bio-teal opacity-75" />
                   <span className="relative inline-flex h-2 w-2 rounded-full bg-bio-teal" />
                 </span>
-                3rd Year BMLT Student
+                {p?.year || "3rd Year BMLT Student"}
               </span>
             </motion.div>
 
             {/* Main heading */}
             <h1 className="font-heading text-5xl font-bold leading-tight tracking-tight sm:text-6xl md:text-7xl lg:text-8xl">
               <span className="text-deep-diagnostic dark:text-ice-blue">
-                Subham
+                {firstName}
               </span>{" "}
               <span className="bg-gradient-to-r from-clinical-blue via-bio-teal to-clinical-blue bg-clip-text text-transparent">
-                kaibarta
+                {lastName}
               </span>
             </h1>
 
@@ -141,9 +200,9 @@ export default function Home() {
               className="mx-auto max-w-2xl text-lg leading-relaxed text-muted-foreground sm:text-xl"
             >
               <span className="inline-block bg-gradient-to-r from-clinical-blue/80 to-bio-teal/80 bg-clip-text text-transparent font-medium">
-                BMLT Student
+                {taglineStart}
               </span>{" "}
-              | Future Medical Lab Technologist
+              | {taglineEnd}
             </motion.p>
             <motion.p
               initial={{ opacity: 0 }}
@@ -151,7 +210,7 @@ export default function Home() {
               transition={{ delay: 0.7, duration: 0.8 }}
               className="mx-auto max-w-xl text-sm leading-relaxed text-muted-foreground/70"
             >
-              Precision meets passion — dedicated to clinical diagnostics, laboratory science, and advancing healthcare through accurate testing.
+              {p?.bio || "Precision meets passion — dedicated to clinical diagnostics, laboratory science, and advancing healthcare through accurate testing."}
             </motion.p>
 
             {/* CTA buttons */}
@@ -188,14 +247,14 @@ export default function Home() {
               className="flex justify-center gap-10 pt-6"
             >
               {[
-                { icon: Award, label: "Certificates", value: "4+" },
-                { icon: CalendarDays, label: "Workshops", value: "3+" },
-                { icon: Microscope, label: "Skills", value: "9+" },
+                { icon: Award, label: "Certificates", value: stats.certificates },
+                { icon: CalendarDays, label: "Workshops", value: stats.workshops },
+                { icon: Microscope, label: "Skills", value: stats.skills },
               ].map((stat) => (
                 <div key={stat.label} className="group text-center">
                   <stat.icon className="mx-auto h-4 w-4 text-clinical-blue/60 transition-all group-hover:text-bio-teal dark:text-bio-teal/60" />
                   <div className="mt-1.5 text-xl font-bold text-deep-diagnostic dark:text-ice-blue">
-                    {stat.value}
+                    {stat.value}{stat.value > 0 ? "+" : ""}
                   </div>
                   <div className="text-[10px] uppercase tracking-wider text-muted-foreground/60">
                     {stat.label}
@@ -263,14 +322,10 @@ export default function Home() {
                     Dedicated BMLT Student
                   </h3>
                   <p className="text-sm leading-relaxed text-muted-foreground">
-                    I&apos;m a passionate 3rd-year Bachelor of Medical Laboratory 
-                    Technology student with a deep commitment to clinical laboratory 
-                    science. My journey is driven by the belief that accurate 
-                    diagnostics saves lives.
+                    {p?.bio?.split(".")[0] || "I'm a passionate 3rd-year Bachelor of Medical Laboratory Technology student with a deep commitment to clinical laboratory science."}
                   </p>
                   <p className="text-sm leading-relaxed text-muted-foreground/70">
-                    From hematology to molecular diagnostics, I&apos;m building the 
-                    skills needed to excel as a future Medical Lab Technologist.
+                    {p?.bio?.split(".").slice(1).join(".").trim() || "From hematology to molecular diagnostics, building the skills needed to excel as a future Medical Lab Technologist."}
                   </p>
                   <Link
                     href="/about"
@@ -358,7 +413,7 @@ export default function Home() {
             }}
             className="flex flex-wrap justify-center gap-3"
           >
-            {skillTags.map((skill) => (
+            {displaySkills.map((skill) => (
               <motion.div
                 key={skill}
                 variants={{

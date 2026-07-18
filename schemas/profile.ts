@@ -6,6 +6,7 @@ export const profileSchema = z.object({
   bio: z.string().max(5000).optional(),
   year: z.string().max(50).optional(),
   institution: z.string().max(200).optional(),
+  avatarUrl: z.string().url().optional().nullable(),
   skills: z.array(z.string()).optional(),
   resumeUrl: z.string().url().optional().nullable(),
   socialLinks: z
@@ -13,6 +14,7 @@ export const profileSchema = z.object({
       linkedin: z.string().url().optional().nullable(),
       github: z.string().url().optional().nullable(),
       instagram: z.string().url().optional().nullable(),
+      facebook: z.string().url().optional().nullable(),
       email: z.string().email().optional().nullable(),
     })
     .optional(),

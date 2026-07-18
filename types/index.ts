@@ -54,12 +54,14 @@ export interface IProfile {
   bio: string;
   year: string;
   institution: string;
+  avatarUrl?: string;
   skills: string[];
   resumeUrl?: string;
   socialLinks: {
     linkedin?: string;
     github?: string;
     instagram?: string;
+    facebook?: string;
     email?: string;
   };
   updatedAt: string;

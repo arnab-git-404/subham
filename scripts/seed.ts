@@ -141,7 +141,8 @@ async function seed() {
       tagline: "BMLT Student | Future Medical Lab Technologist",
       bio: "Dedicated 3rd-year Bachelor of Medical Laboratory Technology student with a deep passion for clinical laboratory science. Skilled in hematology, microbiology, and clinical biochemistry.",
       year: "3rd Year BMLT",
-      institution: "",
+      institution: "University of Health Sciences",
+      avatarUrl: "https://res.cloudinary.com/demo/image/upload/sample.jpg",
       skills: [
         "Hematology",
         "Microbiology",
@@ -157,6 +158,7 @@ async function seed() {
         linkedin: "https://linkedin.com/in/subhamdas",
         github: "https://github.com/subhamdas",
         instagram: "https://instagram.com/subhamdas",
+        facebook: "https://facebook.com/subhamdas",
         email: "subham.das@email.com",
       },
     });

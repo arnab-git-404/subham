@@ -6,12 +6,14 @@ export interface IProfileDoc extends Document {
   bio: string;
   year: string;
   institution: string;
+  avatarUrl?: string;
   skills: string[];
   resumeUrl?: string;
   socialLinks: {
     linkedin?: string;
     github?: string;
     instagram?: string;
+    facebook?: string;
     email?: string;
   };
   updatedAt: Date;
@@ -24,12 +26,14 @@ const ProfileSchema = new Schema<IProfileDoc>(
     bio: { type: String, default: "" },
     year: { type: String, default: "3rd Year BMLT" },
     institution: { type: String, default: "" },
+    avatarUrl: { type: String },
     skills: [{ type: String }],
     resumeUrl: { type: String },
     socialLinks: {
       linkedin: { type: String },
       github: { type: String },
       instagram: { type: String },
+      facebook: { type: String },
       email: { type: String },
     },
   },

@@ -8,6 +8,7 @@ import {
   Award,
   CalendarDays,
   MessageSquare,
+  User,
   LogOut,
   FlaskConical,
   Menu,
@@ -19,6 +20,7 @@ import { cn } from "@/lib/utils";
 
 const adminLinks = [
   { href: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/admin/profile", label: "Profile", icon: User },
   { href: "/admin/certificates", label: "Certificates", icon: Award },
   { href: "/admin/workshops", label: "Workshops", icon: CalendarDays },
   { href: "/admin/messages", label: "Messages", icon: MessageSquare },

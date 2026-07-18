@@ -8,6 +8,7 @@ export interface IWorkshopDoc extends Document {
   description?: string;
   certificateFileUrl?: string;
   skillsGained: string[];
+  order: number;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -21,11 +22,12 @@ const WorkshopSchema = new Schema<IWorkshopDoc>(
     description: { type: String, maxlength: 5000 },
     certificateFileUrl: { type: String },
     skillsGained: [{ type: String }],
+    order: { type: Number, required: true, default: 0 },
   },
   { timestamps: true }
 );
 
-WorkshopSchema.index({ date: -1 });
+WorkshopSchema.index({ order: 1, date: -1 });
 
 export const Workshop =
   mongoose.models.Workshop ??

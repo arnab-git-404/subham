@@ -47,6 +47,7 @@ export default function AdminWorkshopsPage() {
     description: "",
     certificateFileUrl: "",
     skillsGained: "",
+    order: 0,
   });
 
   async function fetchWorkshops() {
@@ -75,6 +76,7 @@ export default function AdminWorkshopsPage() {
       description: "",
       certificateFileUrl: "",
       skillsGained: "",
+      order: 0,
     });
     setEditId(null);
   }
@@ -88,6 +90,7 @@ export default function AdminWorkshopsPage() {
       description: ws.description || "",
       certificateFileUrl: ws.certificateFileUrl || "",
       skillsGained: ws.skillsGained.join(", "),
+      order: ws.order,
     });
     setEditId(ws._id);
     setDialogOpen(true);
@@ -184,6 +187,7 @@ export default function AdminWorkshopsPage() {
           <Table>
             <TableHeader>
               <TableRow>
+                <TableHead>Order</TableHead>
                 <TableHead>Title</TableHead>
                 <TableHead className="hidden md:table-cell">Organizer</TableHead>
                 <TableHead className="hidden lg:table-cell">Location</TableHead>
@@ -194,6 +198,9 @@ export default function AdminWorkshopsPage() {
             <TableBody>
               {workshops.map((ws) => (
                 <TableRow key={ws._id}>
+                  <TableCell className="text-xs text-muted-foreground">
+                    {ws.order}
+                  </TableCell>
                   <TableCell className="font-medium">
                     <span className="line-clamp-1">{ws.title}</span>
                   </TableCell>
@@ -261,6 +268,19 @@ export default function AdminWorkshopsPage() {
             </div>
 
             <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="order">Order *</Label>
+                <Input
+                  id="order"
+                  type="number"
+                  min="0"
+                  required
+                  value={formData.order}
+                  onChange={(e) =>
+                    setFormData({ ...formData, order: parseInt(e.target.value) || 0 })
+                  }
+                />
+              </div>
               <div className="space-y-2">
                 <Label htmlFor="organizer">Organizer *</Label>
                 <Input

@@ -24,7 +24,7 @@ export async function GET(request: NextRequest) {
     if (featured === "true") query.featured = true;
 
     const certs = await Certificate.find(query)
-      .sort({ featured: -1, issueDate: -1 })
+      .sort({ order: 1, createdAt: -1 })
       .limit(limit ? parseInt(limit) : 50)
       .lean();
 

@@ -12,6 +12,7 @@ export const certificateSchema = z.object({
   fileType: z.enum(["image", "pdf"]),
   tags: z.array(z.string()).default([]),
   featured: z.boolean().default(false),
+  order: z.number().int().min(0, "Order must be 0 or greater"),
 });
 
 export const certificateCreateSchema = certificateSchema;

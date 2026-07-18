@@ -13,6 +13,7 @@ export interface ICertificate {
   fileType: "image" | "pdf";
   tags: string[];
   featured: boolean;
+  order: number;
   createdAt: string;
   updatedAt: string;
 }
@@ -26,6 +27,7 @@ export interface IWorkshop {
   description?: string;
   certificateFileUrl?: string;
   skillsGained: string[];
+  order: number;
   createdAt: string;
   updatedAt: string;
 }

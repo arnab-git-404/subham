@@ -8,6 +8,7 @@ export const workshopSchema = z.object({
   description: z.string().max(5000).optional().nullable(),
   certificateFileUrl: z.string().url().optional().nullable(),
   skillsGained: z.array(z.string()).default([]),
+  order: z.number().int().min(0, "Order must be 0 or greater"),
 });
 
 export const workshopCreateSchema = workshopSchema;

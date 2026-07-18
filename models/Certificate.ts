@@ -12,6 +12,7 @@ export interface ICertificateDoc extends Document {
   fileType: "image" | "pdf";
   tags: string[];
   featured: boolean;
+  order: number;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -33,12 +34,13 @@ const CertificateSchema = new Schema<ICertificateDoc>(
     fileType: { type: String, enum: ["image", "pdf"], required: true },
     tags: [{ type: String }],
     featured: { type: Boolean, default: false },
+    order: { type: Number, required: true, default: 0 },
   },
   { timestamps: true }
 );
 
 CertificateSchema.index({ category: 1, featured: -1 });
-CertificateSchema.index({ createdAt: -1 });
+CertificateSchema.index({ order: 1, createdAt: -1 });
 
 export const Certificate =
   mongoose.models.Certificate ??

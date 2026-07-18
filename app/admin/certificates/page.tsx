@@ -56,6 +56,7 @@ export default function AdminCertificatesPage() {
     fileType: "image" as "image" | "pdf",
     tags: "",
     featured: false,
+    order: 0,
   });
 
   async function fetchCertificates() {
@@ -86,6 +87,7 @@ export default function AdminCertificatesPage() {
       fileType: "image",
       tags: "",
       featured: false,
+      order: 0,
     });
     setEditId(null);
   }
@@ -101,6 +103,7 @@ export default function AdminCertificatesPage() {
       fileType: cert.fileType,
       tags: cert.tags.join(", "),
       featured: cert.featured,
+      order: cert.order,
     });
     setEditId(cert._id);
     setDialogOpen(true);
@@ -199,6 +202,7 @@ export default function AdminCertificatesPage() {
           <Table>
             <TableHeader>
               <TableRow>
+                <TableHead>Order</TableHead>
                 <TableHead>Title</TableHead>
                 <TableHead className="hidden md:table-cell">Category</TableHead>
                 <TableHead className="hidden lg:table-cell">Issuer</TableHead>
@@ -209,6 +213,9 @@ export default function AdminCertificatesPage() {
             <TableBody>
               {certificates.map((cert) => (
                 <TableRow key={cert._id}>
+                  <TableCell className="text-xs text-muted-foreground">
+                    {cert.order}
+                  </TableCell>
                   <TableCell className="font-medium">
                     <div className="flex items-center gap-2">
                       <span className="line-clamp-1">{cert.title}</span>
@@ -285,6 +292,19 @@ export default function AdminCertificatesPage() {
             </div>
 
             <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="order">Order *</Label>
+                <Input
+                  id="order"
+                  type="number"
+                  min="0"
+                  required
+                  value={formData.order}
+                  onChange={(e) =>
+                    setFormData({ ...formData, order: parseInt(e.target.value) || 0 })
+                  }
+                />
+              </div>
               <div className="space-y-2">
                 <Label htmlFor="category">Category</Label>
                 <Select

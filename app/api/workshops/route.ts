@@ -31,7 +31,7 @@ export async function GET(request: NextRequest) {
     }
 
     const workshops = await Workshop.find(query)
-      .sort({ date: -1 })
+      .sort({ order: 1, date: -1 })
       .lean();
 
     return successResponse(workshops);
